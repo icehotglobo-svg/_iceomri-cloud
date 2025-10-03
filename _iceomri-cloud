@@ -1,0 +1,953 @@
+<!DOCTYPE html>
+<html lang="he">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>_IceOmri Website</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap');
+
+  html, body {
+    margin:0;
+    padding:0;
+    height:100%;
+    font-family: 'Roboto', sans-serif;
+    overflow-x:hidden;
+    color:#fff;
+  }
+
+  .navbar {
+    width:100%;
+    position:fixed;
+    top:0;
+    left:0;
+    background: rgba(0,0,0,0.5);
+    display:flex;
+    justify-content:center;
+    padding:1rem 0;
+    z-index:10;
+    backdrop-filter: blur(5px);
+  }
+
+  .nav-btn {
+    margin:0 1rem;
+    font-size:1.2rem;
+    font-weight:bold;
+    padding:0.5rem 1rem;
+    border-radius:10px;
+    border:none;
+    cursor:pointer;
+    background: linear-gradient(45deg, #4fc3f7, #29b6f6);
+    color:#0d1b2a;
+    box-shadow: 0 0 15px #4fc3f7, 0 0 30px #29b6f6;
+    transition: transform 0.2s, box-shadow 0.2s;
+  }
+
+  .nav-btn:hover {
+    transform: translateY(-3px) scale(1.05);
+    box-shadow: 0 0 25px #4fc3f7, 0 0 50px #29b6f6;
+  }
+
+  .screen {
+    width:100%;
+    height:100vh;
+    display:flex;
+    justify-content:center;
+    align-items:center;
+    flex-direction:column;
+    text-align:center;
+    transition: opacity 0.5s, visibility 0.5s;
+    position: absolute;
+    top: 0;
+    left: 0;
+  }
+
+  .hidden {
+    opacity:0;
+    visibility:hidden;
+    pointer-events:none;
+  }
+
+  .title {
+    font-size:3rem;
+    margin-bottom:2rem;
+    text-shadow: 0 0 10px #4fc3f7, 0 0 20px #29b6f6;
+  }
+
+  .btn {
+    display:inline-block;
+    margin:1rem;
+    padding:1rem 2rem;
+    font-size:1.2rem;
+    font-weight:bold;
+    border:none;
+    border-radius:15px;
+    cursor:pointer;
+    background: linear-gradient(45deg, #4fc3f7, #29b6f6);
+    color:#0d1b2a;
+    box-shadow: 0 0 15px #4fc3f7, 0 0 30px #29b6f6;
+    transition: transform 0.2s, box-shadow 0.2s;
+    text-decoration:none;
+  }
+
+  .btn:hover {
+    transform: translateY(-5px) scale(1.1);
+    box-shadow: 0 0 25px #4fc3f7, 0 0 50px #29b6f6;
+  }
+
+  .cards-container {
+    display:flex;
+    flex-wrap:wrap;
+    justify-content:center;
+    gap:1rem;
+    padding:2rem;
+    max-width:1200px;
+    margin-top:3rem;
+  }
+
+  .card {
+    width:150px;
+    height:200px;
+    background: rgba(255,255,255,0.1);
+    border-radius:15px;
+    display:flex;
+    justify-content:center;
+    align-items:center;
+    font-weight:bold;
+    color:#fff;
+    text-shadow: 0 0 5px #4fc3f7;
+    transition: transform 0.2s, background 0.2s;
+    cursor:pointer;
+  }
+
+  .card:hover {
+    transform: translateY(-5px) scale(1.05);
+    background: rgba(79,195,247,0.3);
+  }
+
+  #home-screen {
+    background: url('https://images.unsplash.com/photo-1506744038136-46273834b3fb?auto=format&fit=crop&w=1950&q=80') no-repeat center center fixed;
+    background-size: cover;
+  }
+
+  #games-screen {
+    background: linear-gradient(180deg, #0066cc, #004499);
+  }
+
+  #game-screen {
+    background: linear-gradient(180deg, #1e3c72, #2a5298);
+    position:relative;
+    overflow:hidden;
+  }
+
+  #leaderboard-screen {
+    background: linear-gradient(180deg, #1a2a3a, #0d1b2a);
+  }
+
+  #login-screen {
+    background: linear-gradient(180deg, #1a2a3a, #0d1b2a);
+  }
+
+  #admin-screen {
+    background: linear-gradient(180deg, #2d1b2a, #1a0d2a);
+  }
+
+  .game-container {
+    width:800px;
+    height:600px;
+    background: rgba(255,255,255,0.9);
+    border-radius:20px;
+    box-shadow: 0 0 30px rgba(79,195,247,0.5);
+    position:relative;
+    overflow:hidden;
+  }
+
+  .player {
+    width:30px;
+    height:30px;
+    background: #000000;
+    border-radius:50%;
+    position:absolute;
+    bottom:50px;
+    left:375px;
+    box-shadow: 0 0 10px #333;
+    z-index:2;
+    border: 2px solid #444;
+  }
+
+  .snow {
+    width:25px;
+    height:25px;
+    background: white;
+    border-radius:50%;
+    position:absolute;
+    box-shadow: 0 0 8px white;
+    opacity: 0.9;
+  }
+
+  .game-ui {
+    position:absolute;
+    top:20px;
+    left:20px;
+    color:#0d1b2a;
+    font-size:1.5rem;
+    font-weight:bold;
+    z-index:3;
+  }
+
+  .game-over {
+    position:absolute;
+    top:50%;
+    left:50%;
+    transform:translate(-50%,-50%);
+    background:rgba(0,0,0,0.9);
+    padding:2rem;
+    border-radius:15px;
+    text-align:center;
+    z-index:4;
+    color: white;
+  }
+
+  .leaderboard {
+    background: rgba(255,255,255,0.1);
+    border-radius:15px;
+    padding:2rem;
+    margin:1rem;
+    min-width:400px;
+    max-width:600px;
+  }
+
+  .leaderboard-item {
+    display:flex;
+    justify-content:space-between;
+    padding:0.5rem 1rem;
+    margin:0.5rem 0;
+    background: rgba(255,255,255,0.1);
+    border-radius:10px;
+    font-size:1.2rem;
+  }
+
+  .leaderboard-rank {
+    font-weight:bold;
+    color:#4fc3f7;
+  }
+
+  .leaderboard-name {
+    flex-grow:1;
+    text-align:right;
+    margin:0 1rem;
+  }
+
+  .leaderboard-score {
+    font-weight:bold;
+    color:#FFD700;
+  }
+
+  .current-player {
+    background: rgba(79,195,247,0.3);
+    border:2px solid #4fc3f7;
+  }
+
+  .name-input, .password-input {
+    padding:1rem;
+    font-size:1.2rem;
+    border-radius:10px;
+    border:2px solid #4fc3f7;
+    background: rgba(255,255,255,0.9);
+    color:#0d1b2a;
+    margin:0.5rem;
+    text-align:center;
+    width:250px;
+  }
+
+  .login-form {
+    background: rgba(255,255,255,0.1);
+    border-radius:15px;
+    padding:2rem;
+    margin:1rem;
+    min-width:300px;
+  }
+
+  .user-info {
+    position:absolute;
+    top:20px;
+    right:20px;
+    background: rgba(255,255,255,0.1);
+    padding:0.5rem 1rem;
+    border-radius:10px;
+    font-size:1rem;
+  }
+
+  .login-options {
+    display: flex;
+    gap: 1rem;
+    margin: 1rem 0;
+  }
+
+  .option-btn {
+    padding: 0.8rem 1.5rem;
+    border: 2px solid #4fc3f7;
+    background: transparent;
+    color: #4fc3f7;
+    border-radius: 10px;
+    cursor: pointer;
+    font-size: 1rem;
+    transition: all 0.3s;
+  }
+
+  .option-btn.active {
+    background: #4fc3f7;
+    color: #0d1b2a;
+  }
+
+  .online-badge {
+    background: #51cf66;
+    color: white;
+    padding: 0.3rem 0.8rem;
+    border-radius: 15px;
+    font-size: 0.8rem;
+    margin-left: 1rem;
+  }
+
+  .secret-access {
+    position: fixed;
+    bottom: 10px;
+    right: 10px;
+    background: rgba(0,0,0,0.7);
+    padding: 0.5rem;
+    border-radius: 10px;
+    font-size: 0.7rem;
+    opacity: 0.3;
+    transition: opacity 0.3s;
+    cursor: pointer;
+  }
+
+  .secret-access:hover {
+    opacity: 1;
+  }
+
+  .admin-panel {
+    background: rgba(255,255,255,0.1);
+    border-radius:15px;
+    padding:2rem;
+    margin:1rem;
+    min-width:400px;
+    max-width:600px;
+  }
+
+  .admin-feature {
+    background: rgba(255,255,255,0.05);
+    border-radius:10px;
+    padding:1rem;
+    margin:1rem 0;
+    border: 1px solid #ff6b6b;
+  }
+
+  .danger-btn {
+    background: linear-gradient(45deg, #ff6b6b, #ee5a52);
+  }
+
+  .website-link {
+    position: fixed;
+    bottom: 10px;
+    left: 10px;
+    background: rgba(0,0,0,0.7);
+    padding: 0.5rem 1rem;
+    border-radius: 10px;
+    font-size: 0.8rem;
+    color: #4fc3f7;
+    text-decoration: none;
+    transition: all 0.3s;
+    border: 1px solid #4fc3f7;
+  }
+
+  .website-link:hover {
+    background: rgba(79,195,247,0.3);
+    transform: translateY(-2px);
+  }
+</style>
+</head>
+<body>
+
+<div class="navbar">
+  <button class="nav-btn" onclick="showScreen('home')">בית</button>
+  <button class="nav-btn" onclick="showLogin()">משחקים</button>
+</div>
+
+<!-- קישור לאתר האמיתי -->
+<a href="https://ice.google.com/view/_IceOmri/clud" class="website-link" target="_blank">
+  🌐 האתר האמיתי שלי
+</a>
+
+<!-- כפתור גישה סודי -->
+<div class="secret-access" onclick="showSecretAccess()">
+  🐼 גישה סודית
+</div>
+
+<div id="home-screen" class="screen">
+  <div class="title">_IceOmri</div>
+  <a class="btn" href="https://he.namemc.com/profile/_IceOmri.1">NameMC</a>
+  <a class="btn" href="https://store.steampowered.com/">Steam</a>
+  <a class="btn" href="https://ice.google.com/view/_IceOmri/clud" target="_blank">🌐 האתר האמיתי שלי</a>
+  <a class="btn" href="#">Spotify (בקרוב)</a>
+</div>
+
+<div id="login-screen" class="screen hidden">
+  <div class="title">התחברות למערכת</div>
+  <div class="login-form">
+    <div class="login-options">
+      <button class="option-btn active" id="login-option" onclick="showLoginForm()">התחברות</button>
+      <button class="option-btn" id="register-option" onclick="showRegisterForm()">הרשמה</button>
+    </div>
+    
+    <div id="login-form">
+      <input type="text" class="name-input" id="login-username" placeholder="שם משתמש">
+      <br>
+      <input type="password" class="password-input" id="login-password" placeholder="סיסמה">
+      <br>
+      <button class="btn" onclick="login()">התחבר</button>
+    </div>
+    
+    <div id="register-form" style="display: none;">
+      <input type="text" class="name-input" id="register-username" placeholder="שם משתמש חדש">
+      <br>
+      <input type="password" class="password-input" id="register-password" placeholder="סיסמה חדשה">
+      <br>
+      <button class="btn" onclick="register()">צור חשבון</button>
+    </div>
+  </div>
+</div>
+
+<div id="games-screen" class="screen hidden">
+  <div id="user-info" class="user-info">
+    מחובר כ: <span id="current-username"></span>
+    <button class="btn" onclick="logout()" style="margin-left: 1rem; padding: 0.3rem 0.8rem; font-size: 0.8rem;">יציאה</button>
+  </div>
+  <div class="title">משחקים</div>
+  <div class="cards-container">
+    <div class="card" onclick="showLeaderboard()">השלג נמס</div>
+    <div class="card">בקרוב</div>
+    <div class="card">בקרוב</div>
+    <div class="card">בקרוב</div>
+    <div class="card">בקרוב</div>
+    <div class="card">בקרוב</div>
+    <div class="card">בקרוב</div>
+    <div class="card">בקרוב</div>
+    <div class="card">בקרוב</div>
+    <div class="card">בקרוב</div>
+  </div>
+</div>
+
+<div id="leaderboard-screen" class="screen hidden">
+  <div class="title">טופ שחקנים - השלג נמס</div>
+  <div style="margin-bottom: 1rem;">
+    <span class="online-badge">טופ מקומי</span>
+    <small style="opacity: 0.7;">(נשמר רק בדפדפן זה)</small>
+  </div>
+  <div class="leaderboard" id="leaderboard">
+    <div style="padding: 2rem; font-size: 1.2rem;">אין עדיין תוצאות</div>
+  </div>
+  <button class="btn" onclick="startGame()">שחק עכשיו!</button>
+</div>
+
+<div id="game-screen" class="screen hidden">
+  <div class="game-container">
+    <div class="game-ui">
+      <div>ניקוד: <span id="score">0</span></div>
+      <div>שיא אישי: <span id="personal-best">0</span></div>
+    </div>
+    <div class="player" id="player"></div>
+  </div>
+</div>
+
+<!-- מסך ניהול סודי -->
+<div id="admin-screen" class="screen hidden">
+  <div class="title">🐼 פאנל ניהול סודי</div>
+  <div class="admin-panel">
+    <h3 style="color: #ff6b6b; margin-bottom: 2rem;">גישה מיוחדת - פנדה מקסיקנית</h3>
+    
+    <div class="admin-feature">
+      <h4>🎮 ניהול משחקים</h4>
+      <button class="btn" onclick="resetAllScores()">🗑️ אפס את כל הניקודים</button>
+      <button class="btn" onclick="addTestPlayers()">🧪 הוסף שחקני בדיקה</button>
+    </div>
+
+    <div class="admin-feature">
+      <h4>👥 ניהול משתמשים</h4>
+      <button class="btn" onclick="showAllUsers()">📊 הצג כל המשתמשים</button>
+      <button class="btn danger-btn" onclick="deleteAllUsers()">⚠️ מחק את כל המשתמשים</button>
+    </div>
+
+    <div class="admin-feature">
+      <h4>⚙️ הגדרות מערכת</h4>
+      <button class="btn" onclick="changeGameSpeed()">⚡ שנה מהירות משחק</button>
+      <button class="btn" onclick="exportData()">💾 ייצא נתונים</button>
+    </div>
+
+    <div id="admin-results" style="margin-top: 2rem;"></div>
+    
+    <div style="margin-top: 2rem;">
+      <button class="btn" onclick="showScreen('home')">🏠 חזרה לבית</button>
+    </div>
+  </div>
+</div>
+
+<script>
+  // משתמשים וטופ - נשמרים ב-localStorage (מקומי בלבד)
+  let currentUser = JSON.parse(localStorage.getItem('currentUser')) || null;
+  let users = JSON.parse(localStorage.getItem('snowGameUsers')) || [];
+  let leaderboard = JSON.parse(localStorage.getItem('snowGameLeaderboard')) || [];
+  
+  let currentScreen = 'home';
+  let gameActive = false;
+  let score = 0;
+  let playerX = 375;
+  let snowflakes = [];
+  let gameSpeed = 1.0;
+
+  // טעינה ראשונית - תמיד מתחיל במסך הבית
+  window.addEventListener('load', function() {
+    showScreen('home'); // תמיד מתחיל בבית!
+  });
+
+  // פונקציות גישה סודית
+  function showSecretAccess() {
+    const password = prompt('🔐 הכנס סיסמת גישה סודית:');
+    if (password === 'פנדה מקסיקנית') {
+      showScreen('admin');
+    } else if (password) {
+      alert('❌ סיסמה לא נכונה!');
+    }
+  }
+
+  // פונקציות ניהול
+  function resetAllScores() {
+    if (confirm('⚠️ האם אתה בטוח שברצונך לאפס את כל הניקודים בטופ?')) {
+      leaderboard = [];
+      localStorage.setItem('snowGameLeaderboard', JSON.stringify(leaderboard));
+      showAdminResult('✅ כל הניקודים אופסו!', 'success');
+    }
+  }
+
+  function addTestPlayers() {
+    const testPlayers = [
+      { username: 'IceMaster', score: 250 },
+      { username: 'SnowKing', score: 180 },
+      { username: 'FrostQueen', score: 150 },
+      { username: 'WinterPro', score: 120 },
+      { username: 'ColdWarrior', score: 100 }
+    ];
+
+    testPlayers.forEach(player => {
+      // הסר אם כבר קיים
+      leaderboard = leaderboard.filter(p => p.username !== player.username);
+      // הוסף
+      leaderboard.push({
+        username: player.username,
+        score: player.score,
+        date: new Date().toLocaleDateString('he-IL')
+      });
+    });
+
+    localStorage.setItem('snowGameLeaderboard', JSON.stringify(leaderboard));
+    showAdminResult('✅ נוספו 5 שחקני בדיקה לטופ!', 'success');
+  }
+
+  function showAllUsers() {
+    const userList = users.map(user => 
+      `👤 ${user.username} (נרשם: ${user.joined})`
+    ).join('\n');
+    
+    if (users.length === 0) {
+      showAdminResult('📝 אין משתמשים רשומים עדיין', 'info');
+    } else {
+      showAdminResult(`📊 משתמשים רשומים:\n${userList}`, 'info');
+    }
+  }
+
+  function deleteAllUsers() {
+    if (confirm('🚨⚠️ האם אתה בטוח שברצונך למחוק את כל המשתמשים? פעולה זו בלתי הפיכה!')) {
+      users = [];
+      currentUser = null;
+      localStorage.removeItem('snowGameUsers');
+      localStorage.removeItem('currentUser');
+      showAdminResult('✅ כל המשתמשים נמחקו!', 'success');
+    }
+  }
+
+  function changeGameSpeed() {
+    const newSpeed = prompt('⚡ הכנס מהירות משחק חדשה (ברירת מחדל: 1.0):', gameSpeed);
+    if (newSpeed && !isNaN(newSpeed)) {
+      gameSpeed = parseFloat(newSpeed);
+      showAdminResult(`✅ מהירות משחק שונתה ל: ${gameSpeed}`, 'success');
+    }
+  }
+
+  function exportData() {
+    const data = {
+      users: users,
+      leaderboard: leaderboard,
+      exportDate: new Date().toISOString()
+    };
+    
+    const dataStr = JSON.stringify(data, null, 2);
+    const blob = new Blob([dataStr], { type: 'application/json' });
+    const url = URL.createObjectURL(blob);
+    
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = 'iceomri_data_backup.json';
+    a.click();
+    
+    showAdminResult('💾 נתונים יוצאו לקובץ JSON!', 'success');
+  }
+
+  function showAdminResult(message, type) {
+    const resultsDiv = document.getElementById('admin-results');
+    const color = type === 'success' ? '#51cf66' : type === 'error' ? '#ff6b6b' : '#4fc3f7';
+    
+    resultsDiv.innerHTML = `
+      <div style="background: rgba(255,255,255,0.1); padding: 1rem; border-radius: 10px; border-left: 4px solid ${color}; white-space: pre-line;">
+        ${message}
+      </div>
+    `;
+  }
+
+  // שאר הפונקציות נשארות כמו שהיו...
+  function showLogin() {
+    if (currentUser) {
+      showScreen('games');
+    } else {
+      showScreen('login');
+    }
+  }
+
+  function showLoginForm() {
+    document.getElementById('login-form').style.display = 'block';
+    document.getElementById('register-form').style.display = 'none';
+    document.getElementById('login-option').classList.add('active');
+    document.getElementById('register-option').classList.remove('active');
+  }
+
+  function showRegisterForm() {
+    document.getElementById('login-form').style.display = 'none';
+    document.getElementById('register-form').style.display = 'block';
+    document.getElementById('login-option').classList.remove('active');
+    document.getElementById('register-option').classList.add('active');
+  }
+
+  function login() {
+    const username = document.getElementById('login-username').value.trim();
+    const password = document.getElementById('login-password').value;
+
+    if (!username || !password) {
+      alert('אנא מלא את כל השדות!');
+      return;
+    }
+
+    const user = users.find(u => u.username === username && u.password === password);
+    if (!user) {
+      alert('שם משתמש או סיסמה לא נכונים!');
+      return;
+    }
+
+    currentUser = user;
+    localStorage.setItem('currentUser', JSON.stringify(currentUser));
+    showScreen('games');
+  }
+
+  function register() {
+    const username = document.getElementById('register-username').value.trim();
+    const password = document.getElementById('register-password').value;
+
+    if (!username || !password) {
+      alert('אנא מלא את כל השדות!');
+      return;
+    }
+
+    if (users.find(u => u.username === username)) {
+      alert('שם משתמש כבר קיים!');
+      return;
+    }
+
+    const newUser = {
+      username: username,
+      password: password,
+      joined: new Date().toLocaleDateString('he-IL')
+    };
+
+    users.push(newUser);
+    localStorage.setItem('snowGameUsers', JSON.stringify(users));
+    
+    currentUser = newUser;
+    localStorage.setItem('currentUser', JSON.stringify(currentUser));
+    
+    alert('החשבון נוצר בהצלחה!');
+    showScreen('games');
+  }
+
+  function logout() {
+    currentUser = null;
+    localStorage.removeItem('currentUser');
+    showScreen('home'); // חוזר לבית אחרי יציאה
+  }
+
+  function showScreen(screen) {
+    document.getElementById('home-screen').classList.add('hidden');
+    document.getElementById('games-screen').classList.add('hidden');
+    document.getElementById('leaderboard-screen').classList.add('hidden');
+    document.getElementById('game-screen').classList.add('hidden');
+    document.getElementById('login-screen').classList.add('hidden');
+    document.getElementById('admin-screen').classList.add('hidden');
+
+    if(screen === 'home') {
+      document.getElementById('home-screen').classList.remove('hidden');
+      currentScreen = 'home';
+    } else if(screen === 'games') {
+      document.getElementById('games-screen').classList.remove('hidden');
+      loadCurrentUser();
+      currentScreen = 'games';
+    } else if(screen === 'leaderboard') {
+      document.getElementById('leaderboard-screen').classList.remove('hidden');
+      updateLeaderboard();
+      currentScreen = 'leaderboard';
+    } else if(screen === 'game') {
+      document.getElementById('game-screen').classList.remove('hidden');
+      currentScreen = 'game';
+    } else if(screen === 'login') {
+      document.getElementById('login-screen').classList.remove('hidden');
+      showLoginForm();
+      currentScreen = 'login');
+    } else if(screen === 'admin') {
+      document.getElementById('admin-screen').classList.remove('hidden');
+      currentScreen = 'admin';
+    }
+  }
+
+  function loadCurrentUser() {
+    if (currentUser) {
+      document.getElementById('user-info').style.display = 'block';
+      document.getElementById('current-username').textContent = currentUser.username;
+    } else {
+      document.getElementById('user-info').style.display = 'none';
+    }
+  }
+
+  function showLeaderboard() {
+    if (!currentUser) {
+      showScreen('login');
+      return;
+    }
+    showScreen('leaderboard');
+  }
+
+  function updateLeaderboard() {
+    const leaderboardElement = document.getElementById('leaderboard');
+    leaderboardElement.innerHTML = '';
+    
+    const sortedLeaderboard = [...leaderboard].sort((a, b) => b.score - a.score).slice(0, 10);
+    
+    if (sortedLeaderboard.length === 0) {
+      leaderboardElement.innerHTML = '<div style="padding: 2rem; font-size: 1.2rem;">אין עדיין תוצאות. שחק כדי להופיע כאן!</div>';
+      return;
+    }
+    
+    sortedLeaderboard.forEach((player, index) => {
+      const item = document.createElement('div');
+      item.className = 'leaderboard-item';
+      if (currentUser && player.username === currentUser.username) {
+        item.classList.add('current-player');
+      }
+      item.innerHTML = `
+        <span class="leaderboard-rank">#${index + 1}</span>
+        <span class="leaderboard-name">${player.username}</span>
+        <span class="leaderboard-score">${player.score}</span>
+      `;
+      leaderboardElement.appendChild(item);
+    });
+  }
+
+  function getPersonalBest() {
+    if (!currentUser) return 0;
+    const userEntry = leaderboard.find(entry => entry.username === currentUser.username);
+    return userEntry ? userEntry.score : 0;
+  }
+
+  function startGame() {
+    showScreen('game');
+    resetGame();
+    gameActive = true;
+    gameLoop();
+  }
+
+  function resetGame() {
+    score = 0;
+    playerX = 375;
+    snowflakes = [];
+    gameSpeed = 1.0;
+    updateUI();
+    
+    document.querySelectorAll('.snow').forEach(snow => snow.remove());
+    document.querySelectorAll('.game-over').forEach(screen => screen.remove());
+    
+    document.getElementById('player').style.left = playerX + 'px';
+    document.getElementById('personal-best').textContent = getPersonalBest();
+  }
+
+  function updateUI() {
+    document.getElementById('score').textContent = score;
+  }
+
+  function gameLoop() {
+    if (!gameActive) return;
+
+    if (Math.random() < 0.04) {
+      createSnowflake();
+    }
+
+    moveSnowflakes();
+    checkCollisions();
+
+    if (score >= 2000 && score % 100 === 0) {
+      gameSpeed += 0.1;
+    }
+
+    requestAnimationFrame(gameLoop);
+  }
+
+  function createSnowflake() {
+    const snowflake = {
+      x: Math.random() * 770,
+      y: -30,
+      element: document.createElement('div')
+    };
+    snowflake.element.className = 'snow';
+    snowflake.element.style.left = snowflake.x + 'px';
+    snowflake.element.style.top = snowflake.y + 'px';
+    document.querySelector('.game-container').appendChild(snowflake.element);
+    snowflakes.push(snowflake);
+  }
+
+  function moveSnowflakes() {
+    for (let i = snowflakes.length - 1; i >= 0; i--) {
+      const snowflake = snowflakes[i];
+      snowflake.y += gameSpeed;
+      snowflake.element.style.top = snowflake.y + 'px';
+
+      if (snowflake.y > 600) {
+        snowflake.element.remove();
+        snowflakes.splice(i, 1);
+        score += 1;
+        updateUI();
+      }
+    }
+  }
+
+  function checkCollisions() {
+    const player = document.getElementById('player');
+    const playerRect = player.getBoundingClientRect();
+
+    for (let i = snowflakes.length - 1; i >= 0; i--) {
+      const snowflake = snowflakes[i];
+      const snowRect = snowflake.element.getBoundingClientRect();
+
+      if (isColliding(playerRect, snowRect)) {
+        gameOver();
+        return;
+      }
+    }
+  }
+
+  function isColliding(rect1, rect2) {
+    const shrinkFactor = 0.6;
+    const rect1Shrunk = {
+      left: rect1.left + (rect1.width * (1 - shrinkFactor) / 2),
+      right: rect1.right - (rect1.width * (1 - shrinkFactor) / 2),
+      top: rect1.top + (rect1.height * (1 - shrinkFactor) / 2),
+      bottom: rect1.bottom - (rect1.height * (1 - shrinkFactor) / 2)
+    };
+
+    const rect2Shrunk = {
+      left: rect2.left + (rect2.width * (1 - shrinkFactor) / 2),
+      right: rect2.right - (rect2.width * (1 - shrinkFactor) / 2),
+      top: rect2.top + (rect2.height * (1 - shrinkFactor) / 2),
+      bottom: rect2.bottom - (rect2.height * (1 - shrinkFactor) / 2)
+    };
+
+    return rect1Shrunk.left < rect2Shrunk.right && 
+           rect1Shrunk.right > rect2Shrunk.left && 
+           rect1Shrunk.top < rect2Shrunk.bottom && 
+           rect1Shrunk.bottom > rect2Shrunk.top;
+  }
+
+  function gameOver() {
+    gameActive = false;
+    
+    const personalBest = getPersonalBest();
+    
+    if (score > personalBest && currentUser) {
+      leaderboard = leaderboard.filter(entry => entry.username !== currentUser.username);
+      leaderboard.push({
+        username: currentUser.username,
+        score: score,
+        date: new Date().toLocaleDateString('he-IL')
+      });
+      localStorage.setItem('snowGameLeaderboard', JSON.stringify(leaderboard));
+    }
+    
+    const gameOverScreen = document.createElement('div');
+    gameOverScreen.className = 'game-over';
+    gameOverScreen.innerHTML = `
+      <h2>המשחק נגמר!</h2>
+      <p>ניקוד סופי: ${score}</p>
+      <p>שיא אישי: ${Math.max(score, personalBest)}</p>
+      <div style="margin: 1rem 0;">
+        <button class="btn" onclick="closeGameOver(); showLeaderboard();">צפה בטופ</button>
+        <button class="btn" onclick="closeGameOver(); startGame();">שחק שוב</button>
+      </div>
+    `;
+    document.querySelector('.game-container').appendChild(gameOverScreen);
+  }
+
+  function closeGameOver() {
+    document.querySelectorAll('.game-over').forEach(screen => screen.remove());
+  }
+
+  // שליטה במשחק
+  document.addEventListener('keydown', (e) => {
+    if (!gameActive) return;
+
+    if (e.key === 'ArrowLeft' && playerX > 0) {
+      playerX -= 20;
+    } else if (e.key === 'ArrowRight' && playerX < 750) {
+      playerX += 20;
+    }
+    
+    document.getElementById('player').style.left = playerX + 'px';
+  });
+
+  document.querySelector('.game-container').addEventListener('mousemove', (e) => {
+    if (!gameActive) return;
+    
+    const container = document.querySelector('.game-container');
+    const rect = container.getBoundingClientRect();
+    const mouseX = e.clientX - rect.left;
+    
+    playerX = Math.max(0, Math.min(750, mouseX - 15));
+    document.getElementById('player').style.left = playerX + 'px';
+  });
+
+  document.querySelector('.game-container').addEventListener('touchmove', (e) => {
+    if (!gameActive) return;
+    e.preventDefault();
+    
+    const container = document.querySelector('.game-container');
+    const rect = container.getBoundingClientRect();
+    const touchX = e.touches[0].clientX - rect.left;
+    
+    playerX = Math.max(0, Math.min(750, touchX - 15));
+    document.getElementById('player').style.left = playerX + 'px';
+  });
+</script>
+</body>
+</html>
